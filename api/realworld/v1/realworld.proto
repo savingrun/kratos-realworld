@@ -13,55 +13,174 @@ option java_outer_classname = "realworldProtoV1";
 
 // The greeting service definition.
 service RealWorld {
-	rpc Login(LoginRequest) returns (LoginReply) {
+
+	rpc Login(LoginRequest) returns (UserReply) {
 		option (google.api.http) = {
 			post: "/api/users/login",
 			body: "*",
 		};
 	}
+
+	rpc Registration(RegistrationRequest) returns (UserReply) {
+		option (google.api.http) = {
+			post: "/api/users",
+			body: "*",
+		};
+	}
+
+	rpc GetCurrentUser(GetCurrentUserRequest) returns (UserReply) {
+		option (google.api.http) = {
+			get: "/api/user",
+		};
+	}            
+
+	rpc UpdateUser(UpdateUserRequest) returns (UserReply) {
+		option (google.api.http) = {
+			put: "/api/user",
+			body: "*",
+		};
+	}
+
+	rpc GetProfile(GetProfileRequest) returns (ProfileReply) {
+		option (google.api.http) = {
+			get: "/api/profiles/{username}",
+		};
+	}
 }
 
-message User {
-	string email = 1;
-	string token = 2;
-	string username = 3;
-	string bio = 4;
-	google.protobuf.Any image = 5;
+message LoginRequest {
+	message User {
+		string email = 1;
+		string password = 2;
+	}
+	User user = 1;
 }
 
-message Profile {
+message RegistrationRequest {
+	message User {
+		string email = 1;
+		string bio = 2;
+		string image = 3;
+	}
+	User user = 1;
+}
+
+message GetCurrentUserRequest {}
+
+message UpdateUserRequest {
+	message User {
+		string email = 1;
+		string bio = 2;
+		string image = 3;
+	}
+	User user = 1;
+}
+
+message GetProfileRequest {
 	string username = 1;
-	string bio = 2;
-	string image = 3;
-	bool following = 4;
 }
 
-message Article {
 
+message UserReply {
+	message Data {
+		string email = 1;
+		string token = 2;
+		string username = 3;
+		string bio = 4;
+		google.protobuf.Any image = 5;
+	}
+	Data user = 1;
+}
+
+message ProfileReply {
+	message Data {
+		string username = 1;
+		string bio = 2;
+		string image = 3;
+		bool following = 4;
+	}
+	Data profile = 1;
+}
+
+message ArticleReply {
 	message Author {
 		string username = 1;
 		string bio = 2;
 		string image = 3;
 		bool following = 4;
 	}
-
-	string slug = 1;
-	string title = 2;
-	string description = 3;
-	string body = 4;
-	repeated string tagList = 5;
-	google.protobuf.Timestamp createdAt = 6;
-	google.protobuf.Timestamp updatedAt = 7;
-	bool favorited = 8;
-	uint32 favoritesCount = 9;
-	Author author = 10;
+	message Data {
+		string slug = 1;
+		string title = 2;
+		string description = 3;
+		string body = 4;
+		repeated string tagList = 5;
+		google.protobuf.Timestamp createdAt = 6;
+		google.protobuf.Timestamp updatedAt = 7;
+		bool favorited = 8;
+		uint32 favoritesCount = 9;
+		Author author = 10;
+	}
+	Data article = 1;
 }
 
-
-message LoginRequest {
-
+message ArticlesReply {
+	message Author {
+		string username = 1;
+		string bio = 2;
+		string image = 3;
+		bool following = 4;
+	}
+	message Data {
+		string slug = 1;
+		string title = 2;
+		string description = 3;
+		string body = 4;
+		repeated string tagList = 5;
+		google.protobuf.Timestamp createdAt = 6;
+		google.protobuf.Timestamp updatedAt = 7;
+		bool favorited = 8;
+		uint32 favoritesCount = 9;
+		Author author = 10;
+	}
+	repeated Data articles = 1;
+	uint32 articlesCount = 2;
 }
 
-message LoginReply {
+message CommentReply {
+	message Author {
+		string username = 1;
+		string bio = 2;
+		string image = 3;
+		bool following = 4;
+	}
+	message Data {
+		uint32 id = 1;
+		google.protobuf.Timestamp createdAt = 2;
+		google.protobuf.Timestamp updatedAt = 3;
+		string body = 4;
+		Author author = 5;
+	}
+	Data comment = 1;
+}
 
+message CommentsReply {
+	message Author {
+		string username = 1;
+		string bio = 2;
+		string image = 3;
+		bool following = 4;
+	}
+	message Data {
+		uint32 id = 1;
+		google.protobuf.Timestamp createdAt = 2;
+		google.protobuf.Timestamp updatedAt = 3;
+		string body = 4;
+		Author author = 5;
+	}
+	repeated Data comments = 1;
+}
+
+message TagsReply {
+	repeated string tags = 1;
 }
