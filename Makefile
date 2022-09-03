@@ -62,10 +62,10 @@ wire:
 .PHONY: all
 # generate all
 all:
-	make api;
-	make config;
-	make generate;
-	make wire;
+	make api
+	make config
+	make generate
+	make wire
 
 # show help
 help:

@@ -32,7 +32,7 @@ service RealWorld {
 		option (google.api.http) = {
 			get: "/api/user",
 		};
-	}            
+	}
 
 	rpc UpdateUser(UpdateUserRequest) returns (UserReply) {
 		option (google.api.http) = {
@@ -41,11 +41,96 @@ service RealWorld {
 		};
 	}
 
-	rpc GetProfile(GetProfileRequest) returns (ProfileReply) {
+	rpc GetProfile(UsernamePathVariableRequest) returns (ProfileReply) {
 		option (google.api.http) = {
 			get: "/api/profiles/{username}",
 		};
 	}
+
+	rpc FollowUser(UsernamePathVariableRequest) returns (ProfileReply) {
+		option (google.api.http) = {
+			post: "/api/profiles/{username}/follow",
+		};
+	}
+
+	rpc UnfollowUser(UsernamePathVariableRequest) returns (ProfileReply) {
+		option (google.api.http) = {
+			delete: "/api/profiles/{username}/follow",
+		};
+	}
+
+	rpc ListArticles(ListArticlesQueryRequest) returns (ArticlesReply) {
+		option (google.api.http) = {
+			get: "/api/articles",
+		};
+	}
+
+	rpc FeedArticles(FeedArticlesQueryRequest) returns (ArticlesReply) {
+		option (google.api.http) = {
+			get: "/api/articles/feed",
+		};
+	}
+
+	rpc GetArticle(SlugPathVariableRequest) returns (ArticleReply) {
+		option (google.api.http) = {
+			get: "/api/articles/{slug}",
+		};
+	}
+
+	rpc CreateArticle(CreateArticleRequest) returns (ArticleReply) {
+		option (google.api.http) = {
+			post: "/api/articles",
+		};
+	}
+
+	rpc UpdateArticle(UpdateArticleRequest) returns (ArticleReply) {
+		option (google.api.http) = {
+			put: "/api/articles/{slug}",
+		};
+	}
+
+	rpc DeleteArticle(SlugPathVariableRequest) returns (ArticleReply) {
+		option (google.api.http) = {
+			delete: "/api/articles/{slug}",
+		};
+	}
+
+	rpc AddComments(AddCommentsRequest) returns (CommentReply) {
+		option (google.api.http) = {
+			post: "/api/articles/{slug}/comments",
+		};
+	}
+
+	rpc GetComments(SlugPathVariableRequest) returns (CommentsReply) {
+		option (google.api.http) = {
+			get: "/api/articles/{slug}/comments",
+		};
+	}
+
+	rpc DeleteComment(DeleteCommentPathVariableRequest) returns (ArticleReply) {
+		option (google.api.http) = {
+			delete: "/api/articles/{slug}/comments/{id}",
+		};
+	}
+
+	rpc FavoriteArticle(SlugPathVariableRequest) returns (ArticleReply) {
+		option (google.api.http) = {
+			post: "/api/articles/{slug}/favorite",
+		};
+	}
+
+	rpc UnfavoriteArticle(SlugPathVariableRequest) returns (ArticleReply) {
+		option (google.api.http) = {
+			delete: "/api/articles/{slug}/favorite",
+		};
+	}
+
+	rpc GetTags(GetTagsRequest) returns (TagsReply) {
+		option (google.api.http) = {
+			get: "/api/tags",
+		};
+	}
+
 }
 
 message LoginRequest {
@@ -76,9 +161,63 @@ message UpdateUserRequest {
 	User user = 1;
 }
 
-message GetProfileRequest {
+message UsernamePathVariableRequest {
 	string username = 1;
 }
+
+message ListArticlesQueryRequest {
+	string tag = 1;
+	string author = 2;
+	string favorited = 3;
+	int64 limit = 4;
+	int64 offset = 5;
+}
+
+message FeedArticlesQueryRequest {
+	int64 limit = 1;
+	int64 offset = 2;
+}
+
+message SlugPathVariableRequest {
+	string slug = 1;
+}
+
+message CreateArticleRequest {
+	message Article {
+		string title = 1;
+		string description = 2;
+		string body = 3;
+		repeated string tagList = 4;
+	}
+	Article article = 1;
+}
+
+message UpdateArticleRequest {
+	message Article {
+		string title = 1;
+		string description = 2;
+		string body = 3;
+		repeated string tagList = 4;
+	}
+	Article article = 1;
+	string slug = 2;
+}
+
+message AddCommentsRequest {
+	message Comment {
+		string body = 1;
+	}
+	Comment comment = 1;
+	string slug = 2;
+}
+
+message DeleteCommentPathVariableRequest {
+	string slug = 1;
+	uint32 id = 2;
+}
+
+message GetTagsRequest {}
+
 
 
 message UserReply {

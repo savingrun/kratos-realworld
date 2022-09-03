@@ -20,10 +20,10 @@ func NewRealWorldService(uc *biz.GreeterUsecase) *RealWorldService {
 }
 
 // SayHello implements realworld.GreeterServer.
-func (s *RealWorldService) SayHello(ctx context.Context, in *v1.HelloRequest) (*v1.HelloReply, error) {
-	g, err := s.uc.CreateGreeter(ctx, &biz.Greeter{Hello: in.Name})
+func (s *RealWorldService) Login(ctx context.Context, in *v1.LoginRequest) (*v1.UserReply, error) {
+	g, err := s.uc.CreateGreeter(ctx, &biz.Greeter{Hello: in.User.GetEmail()})
 	if err != nil {
 		return nil, err
 	}
-	return &v1.HelloReply{Message: "Hello " + g.Hello}, nil
+	return &v1.UserReply{User: &v1.UserReply_Data{Email: "Hello" + g.Hello}}, nil
 }
