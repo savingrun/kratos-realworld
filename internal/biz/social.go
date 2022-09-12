@@ -26,6 +26,6 @@ func NewSocialUseCase(ar ArticleRepo, cr CommentRepo, tr TagRepo, logger log.Log
 	return &SocialUseCase{ar: ar, cr: cr, tr: tr, log: log.NewHelper(logger)}
 }
 
-func (s *SocialUseCase) CreateArticle(ctx context.Context) error {
+func (suc *SocialUseCase) CreateArticle(ctx context.Context) error {
 	return nil
 }

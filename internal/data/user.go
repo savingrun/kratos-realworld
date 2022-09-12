@@ -20,8 +20,12 @@ func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 }
 
 func (r *userRepo) CreateUser(ctx context.Context, user *biz.User) (*biz.User, error) {
-
 	return user, nil
+}
+
+func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*biz.User, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 type profileRepo struct {
