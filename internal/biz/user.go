@@ -2,7 +2,10 @@ package biz
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/go-kratos/kratos/v2/log"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -12,6 +15,22 @@ type User struct {
 	Bio          string `json:"bio"`
 	Image        string `json:"image"`
 	PasswordHash string `json:"passwordHash"`
+}
+
+func hashPassword(password string) string {
+	bcryptPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%v", bcryptPassword)
+	return string(bcryptPassword)
+}
+
+func verifyPassword(hashPassword, inputPassword string) bool {
+	if err := bcrypt.CompareHashAndPassword([]byte(hashPassword), []byte(inputPassword)); err != nil {
+		return false
+	}
+	return true
 }
 
 type UserRepo interface {
