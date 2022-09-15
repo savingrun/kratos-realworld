@@ -14,6 +14,7 @@ type User struct {
 	Email        string `json:"email"`
 	Bio          string `json:"bio"`
 	Image        string `json:"image"`
+	Password     string `json:"password"`
 	PasswordHash string `json:"passwordHash"`
 }
 
@@ -52,10 +53,17 @@ func NewUserUseCase(ur UserRepo, pr ProfileRepo, logger log.Logger) *UserUseCase
 	return &UserUseCase{ur: ur, pr: pr, log: log.NewHelper(logger)}
 }
 
-func (uuc *UserUseCase) Register(ctx context.Context, user *User) error {
-	if err, _ := uuc.ur.CreateUser(ctx, user); err != nil {
+func (uuc *UserUseCase) Register(ctx context.Context, username, email, password string) (*User, error) {
+	user := &User{
+		Username: username,
+		Email:    email,
+		Password: hashPassword(password),
 	}
-	return nil
+	if userRepo, err := uuc.ur.CreateUser(ctx, user); err != nil {
+		return userRepo, err
+	}
+	return nil, nil
+
 }
 
 func (uuc *UserUseCase) Login(ctx context.Context, email, password string) (*User, error) {
