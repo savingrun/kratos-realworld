@@ -3,19 +3,26 @@ package biz
 import (
 	"context"
 	"fmt"
+	"github.com/go-kratos/kratos/v2/errors"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	Username     string `json:"username"`
-	Token        string `json:"token"`
 	Email        string `json:"email"`
+	Username     string `json:"username"`
 	Bio          string `json:"bio"`
 	Image        string `json:"image"`
-	Password     string `json:"password"`
 	PasswordHash string `json:"passwordHash"`
+}
+
+type UserLogin struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
+	Bio      string `json:"bio"`
+	Image    string `json:"image"`
 }
 
 func hashPassword(password string) string {
@@ -53,20 +60,37 @@ func NewUserUseCase(ur UserRepo, pr ProfileRepo, logger log.Logger) *UserUseCase
 	return &UserUseCase{ur: ur, pr: pr, log: log.NewHelper(logger)}
 }
 
-func (uuc *UserUseCase) Register(ctx context.Context, username, email, password string) (*User, error) {
+func (uuc *UserUseCase) Register(ctx context.Context, username, email, password string) (*UserLogin, error) {
 	user := &User{
-		Username: username,
-		Email:    email,
-		Password: hashPassword(password),
+		Username:     username,
+		Email:        email,
+		PasswordHash: hashPassword(password),
 	}
-	if userRepo, err := uuc.ur.CreateUser(ctx, user); err != nil {
-		return userRepo, err
+	if _, err := uuc.ur.CreateUser(ctx, user); err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return &UserLogin{
+		Email:    user.Email,
+		Username: user.Username,
+		Token:    "xxx",
+	}, nil
 
 }
 
-func (uuc *UserUseCase) Login(ctx context.Context, email, password string) (*User, error) {
+func (uuc *UserUseCase) Login(ctx context.Context, email, password string) (*UserLogin, error) {
 	//return uuc.ur.Login(ctx, email, password)
-	return nil, nil
+	u, err := uuc.ur.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	if !verifyPassword(u.PasswordHash, password) {
+		return nil, errors.New(400, "", "login failed")
+	}
+	return &UserLogin{
+		Email:    u.Email,
+		Username: u.Username,
+		Bio:      u.Bio,
+		Image:    u.Image,
+		Token:    "xxx",
+	}, nil
 }
