@@ -2,10 +2,14 @@ package server
 
 import (
 	"context"
+	"github.com/davecgh/go-spew/spew"
+	netHttp "net/http"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/middleware/selector"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/gorilla/handlers"
 	v1 "kratos-realworld/api/realworld/v1"
 	"kratos-realworld/internal/conf"
 	"kratos-realworld/internal/pkg/middleware/auth"
@@ -32,6 +36,19 @@ func NewHTTPServer(c *conf.Server, jwtConf *conf.Jwt, realWorldService *service.
 			recovery.Recovery(),
 			selector.Server(auth.JwtAuthHandler(jwtConf.GetSecret())).Match(NewSkipRoutersMatcher()).Build(),
 		),
+		http.Filter(
+			func(next netHttp.Handler) netHttp.Handler {
+				return netHttp.HandlerFunc(func(w netHttp.ResponseWriter, r *netHttp.Request) {
+					spew.Dump("route filter in")
+					next.ServeHTTP(w, r)
+					spew.Dump("route filter out")
+				})
+			},
+			handlers.CORS(
+				handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+				handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS", "DELETE"}),
+				handlers.AllowedOrigins([]string{"*"}),
+			)),
 	}
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))

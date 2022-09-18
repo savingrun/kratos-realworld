@@ -3,7 +3,6 @@ package biz
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 	"golang.org/x/crypto/bcrypt"
 	"kratos-realworld/internal/conf"
@@ -31,7 +30,6 @@ func hashPassword(password string) string {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%v", bcryptPassword)
 	return string(bcryptPassword)
 }
 
