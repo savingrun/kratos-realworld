@@ -144,8 +144,8 @@ message LoginRequest {
 message RegistrationRequest {
 	message User {
 		string email = 1;
-		string bio = 2;
-		string image = 3;
+		string password = 2;
+		string username = 3;
 	}
 	User user = 1;
 }

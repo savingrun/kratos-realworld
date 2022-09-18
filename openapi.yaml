@@ -600,9 +600,9 @@ components:
             properties:
                 email:
                     type: string
-                bio:
+                password:
                     type: string
-                image:
+                username:
                     type: string
         realworld.v1.TagsReply:
             type: object

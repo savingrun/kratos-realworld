@@ -2,11 +2,12 @@ package biz
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/go-kratos/kratos/v2/errors"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"golang.org/x/crypto/bcrypt"
+	"kratos-realworld/internal/conf"
+	"kratos-realworld/internal/pkg/middleware/auth"
 )
 
 type User struct {
@@ -50,14 +51,19 @@ type ProfileRepo interface {
 }
 
 type UserUseCase struct {
-	ur UserRepo
-	pr ProfileRepo
+	ur      UserRepo
+	pr      ProfileRepo
+	jwtConf *conf.Jwt
 
 	log *log.Helper
 }
 
-func NewUserUseCase(ur UserRepo, pr ProfileRepo, logger log.Logger) *UserUseCase {
-	return &UserUseCase{ur: ur, pr: pr, log: log.NewHelper(logger)}
+func NewUserUseCase(ur UserRepo, pr ProfileRepo, jwtConf *conf.Jwt, logger log.Logger) *UserUseCase {
+	return &UserUseCase{ur: ur, pr: pr, jwtConf: jwtConf, log: log.NewHelper(logger)}
+}
+
+func (uuc *UserUseCase) generateToken(username string) string {
+	return auth.GenerateToken(uuc.jwtConf.Secret, username)
 }
 
 func (uuc *UserUseCase) Register(ctx context.Context, username, email, password string) (*UserLogin, error) {
@@ -72,7 +78,7 @@ func (uuc *UserUseCase) Register(ctx context.Context, username, email, password 
 	return &UserLogin{
 		Email:    user.Email,
 		Username: user.Username,
-		Token:    "xxx",
+		Token:    uuc.generateToken(user.Username),
 	}, nil
 
 }
@@ -84,13 +90,13 @@ func (uuc *UserUseCase) Login(ctx context.Context, email, password string) (*Use
 		return nil, err
 	}
 	if !verifyPassword(u.PasswordHash, password) {
-		return nil, errors.New(400, "", "login failed")
+		return nil, errors.New("login failed")
 	}
 	return &UserLogin{
 		Email:    u.Email,
 		Username: u.Username,
 		Bio:      u.Bio,
 		Image:    u.Image,
-		Token:    "xxx",
+		Token:    uuc.generateToken(u.Username),
 	}, nil
 }

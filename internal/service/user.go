@@ -11,7 +11,15 @@ func (s *RealWorldService) Login(ctx context.Context, request *v1.LoginRequest) 
 }
 
 func (s *RealWorldService) Registration(ctx context.Context, request *v1.RegistrationRequest) (reply *v1.UserReply, err error) {
-	return &v1.UserReply{User: &v1.UserReply_Data{Email: "Saving"}}, nil
+	u, err := s.uc.Register(ctx, request.User.Username, request.User.Email, request.User.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.UserReply{User: &v1.UserReply_Data{
+		Email:    u.Email,
+		Username: u.Username,
+		Token:    u.Token,
+	}}, nil
 }
 
 func (s *RealWorldService) GetCurrentUser(ctx context.Context, request *v1.GetCurrentUserRequest) (reply *v1.UserReply, err error) {
