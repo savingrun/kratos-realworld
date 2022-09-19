@@ -6,14 +6,15 @@
 package main
 
 import (
-	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/google/wire"
 	"kratos-realworld/internal/biz"
 	"kratos-realworld/internal/conf"
 	"kratos-realworld/internal/data"
 	"kratos-realworld/internal/server"
 	"kratos-realworld/internal/service"
+
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/google/wire"
 )
 
 // wireApp init kratos application.
