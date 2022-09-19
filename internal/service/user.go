@@ -3,9 +3,13 @@ package service
 import (
 	"context"
 	v1 "kratos-realworld/api/realworld/v1"
+	"kratos-realworld/internal/errors"
 )
 
 func (s *RealWorldService) Login(ctx context.Context, request *v1.LoginRequest) (reply *v1.UserReply, err error) {
+	if len(request.User.Email) == 0 {
+		return nil, errors.NewHttpError(422, "email", "invalid email")
+	}
 	return &v1.UserReply{User: &v1.UserReply_Data{Email: "Saving"}}, nil
 }
 
