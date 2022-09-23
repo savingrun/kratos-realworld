@@ -26,7 +26,9 @@ func NewData(c *conf.Data, logger log.Logger, db *gorm.DB) (*Data, func(), error
 }
 
 func NewDB(c *conf.Data) *gorm.DB {
-	db, err := gorm.Open(mysql.Open(c.Database.GetDsn()), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(c.Database.GetDsn()), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		panic("failed to connect database")
 	}
