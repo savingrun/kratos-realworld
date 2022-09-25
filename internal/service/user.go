@@ -3,14 +3,17 @@ package service
 import (
 	"context"
 	v1 "kratos-realworld/api/realworld/v1"
-	"kratos-realworld/internal/errors"
 )
 
 func (s *RealWorldService) Login(ctx context.Context, request *v1.LoginRequest) (reply *v1.UserReply, err error) {
-	if len(request.User.Email) == 0 {
-		return nil, errors.NewHttpError(422, "email", "invalid email")
+	login, err := s.uc.Login(ctx, request.User.Email, request.User.Password)
+	if err != nil {
+		return nil, err
 	}
-	return &v1.UserReply{User: &v1.UserReply_Data{Email: "Saving"}}, nil
+	return &v1.UserReply{User: &v1.UserReply_Data{Username: login.Username,
+		Token: login.Token,
+		Email: login.Email,
+		Bio:   login.Bio}}, nil
 }
 
 func (s *RealWorldService) Registration(ctx context.Context, request *v1.RegistrationRequest) (reply *v1.UserReply, err error) {

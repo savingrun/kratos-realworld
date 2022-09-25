@@ -3,6 +3,7 @@ package errors
 import (
 	"errors"
 	"fmt"
+	kErrors "github.com/go-kratos/kratos/v2/errors"
 	netHttp "net/http"
 )
 
@@ -31,6 +32,9 @@ func FromError(err error) *HttpError {
 	}
 	if se := new(HttpError); errors.As(err, &se) {
 		return se
+	}
+	if se := new(kErrors.Error); kErrors.As(err, &se) {
+		return NewHttpError(int(se.Code), se.Reason, se.Message)
 	}
 	return &HttpError{Code: netHttp.StatusInternalServerError}
 }
