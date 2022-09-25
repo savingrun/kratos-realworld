@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"gorm.io/gorm"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"kratos-realworld/internal/biz"
@@ -12,6 +13,15 @@ type userRepo struct {
 	log  *log.Helper
 }
 
+type User struct {
+	gorm.Model
+	Email        string `gorm:"size:500"`
+	Username     string `gorm:"size:500"`
+	Bio          string `gorm:"size:1000"`
+	Image        string `gorm:"size:1000"`
+	PasswordHash string `gorm:"size:1000"`
+}
+
 func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 	return &userRepo{
 		data: data,
@@ -20,7 +30,14 @@ func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 }
 
 func (r *userRepo) CreateUser(ctx context.Context, user *biz.User) (*biz.User, error) {
-	return user, nil
+	u := User{
+		Email:        user.Email,
+		Bio:          user.Bio,
+		Image:        user.Image,
+		Username:     user.Username,
+		PasswordHash: user.PasswordHash}
+	rv := r.data.db.Create(&u)
+	return user, rv.Error
 }
 
 func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*biz.User, error) {

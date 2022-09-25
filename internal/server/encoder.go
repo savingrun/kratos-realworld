@@ -16,6 +16,10 @@ func errorEncoder(w netHttp.ResponseWriter, r *netHttp.Request, err error) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/"+codec.Name())
-	w.WriteHeader(se.Code)
+	if se.Code >= netHttp.StatusContinue || se.Code <= netHttp.StatusNetworkAuthenticationRequired {
+		w.WriteHeader(se.Code)
+	} else {
+		w.WriteHeader(netHttp.StatusInternalServerError)
+	}
 	_, _ = w.Write(body)
 }
