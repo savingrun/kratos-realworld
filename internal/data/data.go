@@ -1,10 +1,14 @@
 package data
 
 import (
+	"context"
 	"kratos-realworld/internal/conf"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -25,12 +29,24 @@ func NewData(c *conf.Data, logger log.Logger, db *gorm.DB) (*Data, func(), error
 	return &Data{db: db}, cleanup, nil
 }
 
+func NewMongoDB(c *conf.Data) *mongo.Client {
+	var uri = "mongodb://root:a123456@10.0.10.13:23301,10.0.10.13:23302," +
+		"10.0.10.13:23303/?maxPoolSize=100&w=majority&authSource=admin"
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	if err != nil {
+		panic("failed to connect mongodb database")
+	}
+	return client
+}
+
 func NewDB(c *conf.Data) *gorm.DB {
 	db, err := gorm.Open(mysql.Open(c.Database.GetDsn()), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect mysql database")
 	}
 	InitDB(db)
 	return db
