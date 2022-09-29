@@ -5,6 +5,8 @@ import (
 	"kratos-realworld/internal/conf"
 	"time"
 
+	"github.com/go-redis/redis/v8"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -39,6 +41,15 @@ func NewMongoDB(c *conf.Data) *mongo.Client {
 		panic("failed to connect mongodb database")
 	}
 	return client
+}
+
+func NewRedis(c *conf.Data) *redis.Client {
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "10.0.10.13:23200",
+		Password: "a123456", // no password set
+		DB:       0,         // use default DB
+	})
+	return rdb
 }
 
 func NewDB(c *conf.Data) *gorm.DB {

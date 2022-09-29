@@ -18,10 +18,11 @@ func TestNewDB(t *testing.T) {
 func TestNewMongoDB(t *testing.T) {
 	mongodb := NewMongoDB(nil)
 	collection := mongodb.Database("kratos").Collection("test")
+	hex, _ := primitive.ObjectIDFromHex("6333f873984a19c70e51ffe7")
 	saving0 := mongodbTest{Username: 123}
 	saving1 := mongodbTest{Username: 1234444}
 	saving2 := mongodbTest{Username: 8888}
-	saving3 := mongodbTest{Username: 77777}
+	saving3 := mongodbTest{Id: hex, Username: 77777}
 	some := []interface{}{saving0, saving1, saving2, saving3}
 	many, err := collection.InsertMany(context.TODO(), some)
 	if err != nil {
@@ -32,7 +33,6 @@ func TestNewMongoDB(t *testing.T) {
 	spew.Dump("-------------------")
 
 	var mongodbStruct mongodbTest
-	hex, _ := primitive.ObjectIDFromHex("6333f873984a19c70e51ffe7")
 	filter := bson.D{{"_id", hex}}
 	if err := collection.FindOne(context.TODO(), filter).Decode(&mongodbStruct); err != nil {
 		spew.Dump("error: ", err)
@@ -44,4 +44,8 @@ func TestNewMongoDB(t *testing.T) {
 type mongodbTest struct {
 	Id       primitive.ObjectID `bson:"_id,omitempty"`
 	Username int64
+}
+
+func TestNewRedis(t *testing.T) {
+	NewMongoDB(nil)
 }
