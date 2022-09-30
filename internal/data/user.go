@@ -3,11 +3,13 @@ package data
 import (
 	"context"
 	"errors"
+
 	kErrors "github.com/go-kratos/kratos/v2/errors"
 	"gorm.io/gorm"
 
-	"github.com/go-kratos/kratos/v2/log"
 	"kratos-realworld/internal/biz"
+
+	"github.com/go-kratos/kratos/v2/log"
 )
 
 type userRepo struct {
@@ -38,13 +40,13 @@ func (r *userRepo) CreateUser(ctx context.Context, user *biz.User) (*biz.User, e
 		Image:        user.Image,
 		Username:     user.Username,
 		PasswordHash: user.PasswordHash}
-	rv := r.data.db.Create(&u)
+	rv := r.data.mysql.Create(&u)
 	return user, rv.Error
 }
 
 func (r *userRepo) GetUserByEmail(ctx context.Context, email string) (*biz.User, error) {
 	u := new(User)
-	result := r.data.db.Where("email = ?", email).Find(&u)
+	result := r.data.mysql.Where("email = ?", email).Find(&u)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, kErrors.NotFound("user", "not found by email")
 	}

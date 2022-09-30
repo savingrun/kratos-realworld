@@ -20,8 +20,10 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, jwt *conf.Jwt, logger log.Logger) (*kratos.App, func(), error) {
-	db := data.NewDB(confData)
-	dataData, cleanup, err := data.NewData(confData, logger, db)
+	db := data.NewMysql(confData)
+	client := data.NewMongoDB(confData)
+	redisClient := data.NewRedis(confData)
+	dataData, cleanup, err := data.NewData(confData, logger, db, client, redisClient)
 	if err != nil {
 		return nil, nil, err
 	}

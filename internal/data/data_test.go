@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestNewDB(t *testing.T) {
-	NewDB(nil)
+	NewMysql(nil)
 }
 
 func TestNewMongoDB(t *testing.T) {
@@ -47,5 +48,17 @@ type mongodbTest struct {
 }
 
 func TestNewRedis(t *testing.T) {
-	NewMongoDB(nil)
+	redis := NewRedis(nil)
+
+	err := redis.Set(context.TODO(), "saving", "savingrun", 0).Err()
+	if err != nil {
+		panic(err)
+	}
+
+	val, err := redis.Get(context.TODO(), "saving").Result()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("key", val)
+
 }

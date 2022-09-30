@@ -16,19 +16,21 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewDB, NewUserRepo, NewProfileRepo)
+var ProviderSet = wire.NewSet(NewData, NewMysql, NewMongoDB, NewRedis, NewUserRepo, NewProfileRepo)
 
 // Data .
 type Data struct {
-	db *gorm.DB
+	mysql   *gorm.DB
+	mongodb *mongo.Client
+	redis   *redis.Client
 }
 
 // NewData .
-func NewData(c *conf.Data, logger log.Logger, db *gorm.DB) (*Data, func(), error) {
+func NewData(c *conf.Data, logger log.Logger, mysql *gorm.DB, mongodb *mongo.Client, redis *redis.Client) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 	}
-	return &Data{db: db}, cleanup, nil
+	return &Data{mysql: mysql, mongodb: mongodb, redis: redis}, cleanup, nil
 }
 
 func NewMongoDB(c *conf.Data) *mongo.Client {
@@ -52,7 +54,7 @@ func NewRedis(c *conf.Data) *redis.Client {
 	return rdb
 }
 
-func NewDB(c *conf.Data) *gorm.DB {
+func NewMysql(c *conf.Data) *gorm.DB {
 	db, err := gorm.Open(mysql.Open(c.Database.GetDsn()), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
