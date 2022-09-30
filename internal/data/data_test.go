@@ -3,12 +3,12 @@ package data
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
-
-	"github.com/davecgh/go-spew/spew"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -16,7 +16,18 @@ func TestNewDB(t *testing.T) {
 	NewMysql(nil)
 }
 
+func TestNewSnowflakeId(t *testing.T) {
+	snowflakeId := NewSnowflakeId(nil)
+	for i := 0; i < 100; i++ {
+		id := snowflakeId.Generate()
+		spew.Dump(strconv.FormatInt(id.Int64(), 10))
+		spew.Dump(id.String())
+		spew.Dump("-")
+	}
+}
+
 func TestNewMongoDB(t *testing.T) {
+
 	mongodb := NewMongoDB(nil)
 	collection := mongodb.Database("kratos").Collection("test")
 	hex, _ := primitive.ObjectIDFromHex("6333f873984a19c70e51ffe7")

@@ -5,6 +5,8 @@ import (
 	"kratos-realworld/internal/conf"
 	"time"
 
+	"github.com/bwmarrin/snowflake"
+
 	"github.com/go-redis/redis/v8"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -52,6 +54,14 @@ func NewRedis(c *conf.Data) *redis.Client {
 		DB:       0,         // use default DB
 	})
 	return rdb
+}
+
+func NewSnowflakeId(c *conf.Data) *snowflake.Node {
+	node, err := snowflake.NewNode(1)
+	if err != nil {
+		panic(err)
+	}
+	return node
 }
 
 func NewMysql(c *conf.Data) *gorm.DB {
